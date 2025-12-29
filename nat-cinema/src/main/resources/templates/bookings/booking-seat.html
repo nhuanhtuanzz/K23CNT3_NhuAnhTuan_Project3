@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/client-layout :: layout(~{::section})}">
+<head>
+    <title>Chọn ghế</title>
+</head>
+<body>
+
+<section class="py-5" style="background-color: #1a1a2e; min-height: 100vh;">
+
+    <style>
+        /* Màn hình chiếu */
+        .screen-container {
+            perspective: 1000px;
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: center;
+        }
+        .screen {
+            background: linear-gradient(to bottom, #fff, rgba(255,255,255,0));
+            height: 60px;
+            width: 80%;
+            border-radius: 50% 50% 0 0 / 20px 20px 0 0;
+            transform: rotateX(-30deg) scale(0.8);
+            box-shadow: 0 30px 50px rgba(255,255,255,0.3);
+            opacity: 0.6;
+            text-align: center;
+            color: #000;
+            font-weight: bold;
+            line-height: 60px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        /* Lưới ghế */
+        .seat-area {
+            max-width: 700px;
+            margin: 0 auto;
+            overflow-x: auto; /* Cuộn ngang nếu màn hình nhỏ */
+            padding-bottom: 20px;
+        }
+
+        .seat-grid {
+            display: grid;
+            /* Tự động chia cột, tối thiểu 40px/ghế */
+            grid-template-columns: repeat(10, 1fr);
+            gap: 12px;
+            padding: 20px;
+            justify-content: center;
+        }
+
+        /* Từng cái ghế */
+        .seat-item {
+            position: relative;
+            height: 40px;
+            border-radius: 8px 8px 12px 12px; /* Bo góc kiểu ghế */
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-bottom: 4px solid rgba(0,0,0,0.2); /* Tạo hiệu ứng độ dày ghế */
+            user-select: none;
+        }
+
+        .seat-item:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        /* --- MÀU SẮC GHẾ --- */
+
+        /* 1. Thường */
+        .seat-NORMAL {
+            background-color: #3b82f6; /* Xanh dương */
+            color: white;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        .seat-NORMAL:hover { background-color: #2563eb; }
+
+        /* 2. VIP */
+        .seat-VIP {
+            background-color: #eab308; /* Vàng */
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(234, 179, 8, 0.3);
+            border: 1px solid #fde047;
+        }
+        .seat-VIP:hover { background-color: #ca8a04; }
+
+        /* 3. Đã đặt */
+        .seat-booked {
+            background-color: #374151 !important; /* Xám đậm */
+            color: #6b7280 !important;
+            cursor: not-allowed !important;
+            border-bottom-color: transparent;
+            box-shadow: none;
+        }
+        .seat-booked i { font-size: 1.2rem; }
+
+        /* 4. Bảo trì */
+        .seat-maintenance {
+            background: repeating-linear-gradient(
+                45deg,
+                #1f2937,
+                #1f2937 10px,
+                #374151 10px,
+                #374151 20px
+            ) !important;
+            color: transparent !important;
+            cursor: not-allowed;
+            opacity: 0.5;
+            border: 1px dashed #6b7280;
+        }
+
+        /* 5. Đang chọn */
+        .seat-item.selected {
+            background-color: #22c55e !important; /* Xanh lá */
+            color: white !important;
+            transform: scale(1.15);
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.7);
+            border-color: #86efac;
+        }
+
+        /* Thanh toán bottom bar */
+        .bottom-bar {
+            background: rgba(22, 33, 62, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+
+    <div class="container pb-5 mb-5">
+        <div class="text-center mb-5 pt-3">
+            <h4 class="text-white-50 text-uppercase ls-2">Phim: <span class="text-white" th:text="${showtime.natMovie.natTitle}"></span></h4>
+            <p class="text-muted">
+                <i class="bi bi-geo-alt me-1"></i> <span th:text="${showtime.natCinemaRoom.natRoomName}"></span> |
+                <i class="bi bi-clock me-1"></i> <span th:text="${#temporals.format(showtime.natStartTime, 'HH:mm - dd/MM/yyyy')}"></span>
+            </p>
+        </div>
+
+        <div class="screen-container">
+            <div class="screen">MÀN HÌNH</div>
+        </div>
+
+        <div class="d-flex justify-content-center flex-wrap gap-4 mb-5 small text-white-50">
+            <div class="d-flex align-items-center"><div class="seat-item seat-NORMAL me-2" style="width:25px; height:25px; cursor:default;"></div> Ghế Thường</div>
+            <div class="d-flex align-items-center"><div class="seat-item seat-VIP me-2" style="width:25px; height:25px; cursor:default;"></div> Ghế VIP</div>
+            <div class="d-flex align-items-center"><div class="seat-item seat-booked me-2" style="width:25px; height:25px; cursor:default;">X</div> Đã đặt</div>
+            <div class="d-flex align-items-center"><div class="seat-item selected me-2" style="width:25px; height:25px; background-color:#22c55e; cursor:default;"></div> Đang chọn</div>
+        </div>
+
+        <div class="seat-area">
+            <div class="seat-grid">
+                <div th:each="seat : ${seats}"
+                     th:classappend="${
+                         seat.isMaintenance ? 'seat-maintenance' :
+                         (seat.isBooked ? 'seat-booked' : 'seat-' + seat.type)
+                     }"
+                     class="seat-item"
+                     th:data-id="${seat.id}"
+                     th:data-price="${seat.price}"
+                     th:onclick="${!seat.isMaintenance && !seat.isBooked} ? 'toggleSeat(this)' : ''">
+
+                    <span th:if="${seat.isBooked}"><i class="bi bi-x-lg"></i></span>
+                    <span th:if="${seat.isMaintenance}"></span>
+                    <span th:if="${!seat.isBooked && !seat.isMaintenance}" th:text="${seat.code}">A1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed-bottom bottom-bar p-3">
+        <div class="container">
+            <form action="/bookings/create" method="post" id="bookingForm">
+                <div class="row align-items-center">
+                    <div class="col-6 col-md-4">
+                        <small class="text-white-50 d-block">Ghế đang chọn:</small>
+                        <span id="selectedSeatsText" class="fw-bold text-white text-truncate d-block">Chưa chọn ghế nào</span>
+                    </div>
+
+                    <div class="col-6 col-md-4 text-end text-md-center">
+                        <small class="text-white-50 d-block">Tạm tính:</small>
+                        <span class="fs-4 fw-bold text-warning" id="totalPrice">0</span> <span class="text-warning small">đ</span>
+                    </div>
+
+                    <div class="col-12 col-md-4 mt-3 mt-md-0 d-grid">
+                        <input type="hidden" name="seatIds" id="seatIdsInput">
+                        <input type="hidden" name="showtimeId" th:value="${showtime.natShowtimeId}">
+
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-lg" disabled id="btnSubmit">
+                            THANH TOÁN <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let selectedSeats = []; // Lưu danh sách ID
+        let selectedCodes = []; // Lưu danh sách tên ghế (A1, B2...)
+        let total = 0;
+
+        function toggleSeat(element) {
+            let id = element.getAttribute('data-id');
+            let price = parseFloat(element.getAttribute('data-price'));
+            let code = element.innerText.trim();
+
+            if (element.classList.contains('selected')) {
+                // Bỏ chọn
+                element.classList.remove('selected');
+
+                selectedSeats = selectedSeats.filter(s => s !== id);
+                selectedCodes = selectedCodes.filter(c => c !== code);
+                total -= price;
+            } else {
+                // Chọn mới
+                element.classList.add('selected');
+
+                selectedSeats.push(id);
+                selectedCodes.push(code);
+                total += price;
+            }
+
+            updateUI();
+        }
+
+        function updateUI() {
+            // 1. Cập nhật text danh sách ghế
+            let seatText = selectedCodes.length > 0 ? selectedCodes.join(', ') : 'Chưa chọn ghế nào';
+            document.getElementById('selectedSeatsText').innerText = seatText;
+
+            // 2. Cập nhật tổng tiền (format tiền Việt)
+            document.getElementById('totalPrice').innerText = new Intl.NumberFormat('vi-VN').format(total);
+
+            // 3. Cập nhật input hidden để gửi về server
+            document.getElementById('seatIdsInput').value = selectedSeats.join(',');
+
+            // 4. Bật/Tắt nút submit
+            let btn = document.getElementById('btnSubmit');
+            if (selectedSeats.length > 0) {
+                btn.removeAttribute('disabled');
+            } else {
+                btn.setAttribute('disabled', 'disabled');
+            }
+        }
+    </script>
+</section>
+
+</body>
+</html>

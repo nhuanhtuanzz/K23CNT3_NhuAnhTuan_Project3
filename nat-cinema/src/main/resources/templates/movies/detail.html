@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/client-layout :: layout(~{::section})}">
+<head>
+    <title th:text="${movie.natTitle}">Chi tiết phim</title>
+</head>
+<body>
+
+<section>
+    <div class="position-relative overflow-hidden" style="min-height: 500px;">
+        <div class="position-absolute w-100 h-100"
+             th:style="'background: url(' + @{'/images/' + ${movie.natPosterUrl}} + ') no-repeat center center; background-size: cover; filter: blur(20px) brightness(0.4); z-index: -1;'">
+        </div>
+
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center">
+                    <img th:src="@{'/images/' + ${movie.natPosterUrl}}"
+                         alt="Poster"
+                         class="img-fluid rounded shadow-lg"
+                         style="max-height: 450px; border: 4px solid #fff; box-shadow: 0 0 20px rgba(255,255,255,0.2);">
+                </div>
+
+                <div class="col-md-8 text-white mt-4 mt-md-0">
+                    <h1 class="display-4 fw-bold mb-2" th:text="${movie.natTitle}">Tên Phim</h1>
+                    <div class="mb-3">
+                         <span class="badge bg-warning text-dark me-2">
+                             <i class="bi bi-clock"></i> <span th:text="${movie.natDuration} + ' phút'"></span>
+                         </span>
+                        <span class="badge bg-info text-dark">
+                             <i class="bi bi-calendar-event"></i> <span th:text="${#temporals.format(movie.natReleaseDate, 'dd/MM/yyyy')}"></span>
+                        </span>
+                    </div>
+
+                    <p class="lead" style="font-size: 1.1rem; opacity: 0.9;" th:text="${movie.natDescription}">
+                        Mô tả nội dung phim...
+                    </p>
+
+                    <button class="btn btn-outline-light rounded-pill px-4 mt-3">
+                        <i class="bi bi-play-circle"></i> Xem Trailer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        <h3 class="text-white border-start border-4 border-warning ps-3 mb-4">Lịch Chiếu</h3>
+
+        <div th:if="${showtimesByDate.isEmpty()}" class="alert alert-secondary text-center">
+            Hiện chưa có lịch chiếu cho phim này.
+        </div>
+
+        <div th:each="entry : ${showtimesByDate}" class="mb-4">
+            <h5 class="text-warning mb-3 fw-bold">
+                <i class="bi bi-calendar2-day me-2"></i>
+                <span th:text="${#temporals.format(entry.key, 'EEEE, dd/MM/yyyy')}">Thứ Hai, 20/12/2023</span>
+            </h5>
+
+            <div class="d-flex flex-wrap gap-3">
+                <a th:each="showtime : ${entry.value}"
+                   th:href="@{/bookings/create/{id}(id=${showtime.natShowtimeId})}"
+                   class="btn btn-outline-light d-flex flex-column align-items-center justify-content-center py-2 px-3"
+                   style="min-width: 100px; border-radius: 10px; transition: all 0.3s;">
+
+                    <span class="fw-bold fs-5" th:text="${#temporals.format(showtime.natStartTime, 'HH:mm')}">19:00</span>
+
+                    <span class="small text-muted" style="font-size: 0.7rem;"
+                          th:text="${showtime.natCinemaRoom.natRoomName}">Phòng 1</span>
+                </a>
+            </div>
+            <hr class="border-secondary mt-4 opacity-25">
+        </div>
+    </div>
+
+</section>
+
+</body>
+</html>

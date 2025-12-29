@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin-layout :: layout(~{::section})}">
+<head>
+    <title>Quản lý Suất chiếu</title>
+</head>
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="bi bi-calendar-event"></i> Quản lý Suất chiếu
+        </h2>
+        <a href="/admin/showtimes/create" class="btn text-white fw-bold"
+           style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border:none;">
+            <i class="bi bi-plus-lg"></i> Thêm Suất chiếu
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Tên Phim</th>
+                    <th>Phòng Chiếu</th> <th>Thời gian chiếu</th>
+                    <th class="text-center">Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="show : ${showtimes}">
+                    <td class="text-muted" th:text="${show.natShowtimeId}">1</td>
+
+                    <td class="fw-bold" th:text="${show.natMovie.natTitle}">Mai</td>
+
+                    <td>
+                        <span class="badge bg-info text-dark"
+                              th:text="${show.natCinemaRoom.natRoomName}">
+                              Phòng 1
+                        </span>
+                    </td>
+
+                    <td th:text="${#temporals.format(show.natStartTime, 'HH:mm dd/MM/yyyy')}">
+                        20:00 20/10/2024
+                    </td>
+
+                    <td class="text-center">
+                        <a th:href="@{/admin/showtimes/delete/{id}(id=${show.natShowtimeId})}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Bạn chắc chắn muốn xóa suất chiếu này?');">
+                            <i class="bi bi-trash"></i> Xóa
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${showtimes.isEmpty()}" class="p-4 text-center text-muted">
+            Chưa có suất chiếu nào được tạo.
+        </div>
+    </div>
+</section>
+</body>
+</html>

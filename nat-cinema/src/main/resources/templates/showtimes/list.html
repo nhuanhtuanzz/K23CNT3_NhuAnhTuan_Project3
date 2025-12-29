@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/client-layout :: layout(~{::section})}">
+<head>
+    <title>Lịch Chiếu Phim</title>
+</head>
+<body>
+<section>
+    <div class="container py-5">
+        <h2 class="text-center mb-5 fw-bold text-uppercase" style="color: #4a4a4a;">
+            🎬 Phim Đang Chiếu
+        </h2>
+
+        <div th:if="${showtimes == null || showtimes.isEmpty()}" class="text-center py-5">
+            <div class="alert alert-warning d-inline-block px-5">
+                <i class="bi bi-info-circle me-2"></i> Hiện chưa có suất chiếu nào sắp tới.
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+
+            <div class="col" th:each="show : ${showtimes}">
+                <div class="card h-100 shadow-sm border-0 transition-hover">
+                    <div class="position-relative overflow-hidden bg-light" style="height: 350px;">
+
+                        <img th:if="${show.natMovie.natPosterUrl != null}"
+                             th:src="@{'/images/' + ${show.natMovie.natPosterUrl}}"
+                             class="card-img-top h-100 w-100"
+                             style="object-fit: cover;" alt="Poster">
+
+                        <div th:if="${show.natMovie.natPosterUrl == null}"
+                             class="d-flex align-items-center justify-content-center h-100 w-100 text-muted">
+                            <i class="bi bi-image fs-1"></i>
+                        </div>
+
+                        <span class="position-absolute top-0 end-0 bg-danger text-white px-3 py-1 m-2 rounded-pill fw-bold shadow">
+                            <i class="bi bi-calendar-event"></i>
+                            <span th:text="${#temporals.format(show.natStartTime, 'dd/MM')}"></span>
+                        </span>
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold text-truncate"
+                            th:text="${show.natMovie.natTitle}"
+                            th:title="${show.natMovie.natTitle}">
+                            Tên Phim
+                        </h5>
+
+                        <div class="text-muted small mb-3">
+                            <i class="bi bi-clock"></i> <span th:text="${show.natMovie.natDuration} + ' phút'"></span>
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-geo-alt"></i> <span th:text="${show.natCinemaRoom.natRoomName}"></span>
+                        </div>
+
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fs-4 fw-bold text-primary">
+                                    <i class="bi bi-play-circle"></i>
+                                    <span th:text="${#temporals.format(show.natStartTime, 'HH:mm')}">19:30</span>
+                                </span>
+
+                                <a th:href="@{/bookings/create/{id}(id=${show.natShowtimeId})}"
+                                   class="btn btn-warning fw-bold text-dark shadow-sm">
+                                    Đặt Vé
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <style>
+        .transition-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .transition-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+        }
+    </style>
+</section>
+</body>
+</html>

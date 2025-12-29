@@ -1,0 +1,25 @@
+<section th:replace="~{layout/admin-layout :: layout(~{::content})}" xmlns:th="http://www.w3.org/1999/xhtml">
+    <div th:fragment="content">
+        <h2 class="mb-4">Lịch sử giao dịch</h2>
+        <table class="table table-striped bg-white shadow-sm">
+            <thead>
+            <tr>
+                <th>Mã GD</th>
+                <th>Mã đơn hàng</th>
+                <th>Số tiền</th>
+                <th>Phương thức</th>
+                <th>Thời gian</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${payments}">
+                <td th:text="${p.natTransactionCode}" class="fw-bold"></td>
+                <td th:text="${'#BK-' + p.natBooking.natBookingId}"></td>
+                <td th:text="${#numbers.formatDecimal(p.natAmount, 0, 'COMMA', 0, 'POINT') + 'đ'}"></td>
+                <td th:text="${p.natPaymentMethod}"></td>
+                <td th:text="${#temporals.format(p.natPaymentDate, 'dd/MM/yyyy HH:mm')}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin-layout :: layout(~{::section})}">
+
+<head>
+    <title>Chi tiết Sơ đồ phòng</title>
+</head>
+
+<body>
+<section>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="bi bi-grid-3x3-gap-fill"></i> Sơ đồ phòng: <span th:text="${room.natRoomName}"></span>
+        </h2>
+        <a href="/admin/rooms" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body text-center p-4">
+
+            <style>
+                /* MÀN HÌNH: Đơn giản, to ở giữa, nhọn 2 đầu */
+                .screen-container {
+                    display: flex;
+                    justify-content: center;
+                    margin-bottom: 40px;
+                }
+                .screen {
+                    width: 80%;
+                    height: 12px;
+                    background-color: #adb5bd; /* Màu xám đậm hơn ghế chút */
+                    border-radius: 50%; /* Tạo hiệu ứng bầu dục/nhọn 2 đầu */
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    position: relative;
+                }
+                .screen::after {
+                    content: 'MÀN HÌNH';
+                    position: absolute;
+                    top: -25px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    font-size: 12px;
+                    color: #adb5bd;
+                    letter-spacing: 2px;
+                }
+
+                /* LƯỚI GHẾ */
+                .seat-map {
+                    display: grid;
+                    grid-template-columns: repeat(10, 1fr); /* 10 ghế 1 hàng */
+                    gap: 10px;
+                    max-width: 700px;
+                    margin: 0 auto;
+                }
+
+                /* GHẾ ĐƠN GIẢN */
+                .seat {
+                    width: 50px;
+                    height: 50px;
+                    background-color: #e9ecef; /* Xám nhạt nền nã */
+                    border: 1px solid #dee2e6; /* Viền xám mờ */
+                    border-radius: 6px; /* Bo nhẹ */
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 600;
+                    color: #495057;
+                    font-size: 14px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    user-select: none;
+                }
+
+                .seat:hover {
+                    background-color: #ced4da;
+                    transform: translateY(-2px);
+                }
+
+                /* TRẠNG THÁI GHẾ */
+                .seat-vip {
+                    background-color: #fff3cd; /* Vàng nhạt */
+                    border-color: #ffecb5;
+                    color: #856404;
+                }
+
+                .seat-maintenance {
+                    background-color: #f8d7da !important; /* Đỏ nhạt */
+                    border-color: #f5c6cb !important;
+                    color: #721c24 !important;
+                    text-decoration: line-through;
+                }
+
+                /* CHÚ THÍCH */
+                .legend-box {
+                    width: 20px; height: 20px;
+                    display: inline-block;
+                    border-radius: 4px;
+                    vertical-align: middle;
+                    margin-right: 5px;
+                    border: 1px solid rgba(0,0,0,0.1);
+                }
+            </style>
+
+            <p class="text-muted mb-4">Click vào ghế để chuyển trạng thái <b>Bảo trì</b> <-> <b>Hoạt động</b></p>
+
+            <div class="d-flex justify-content-center gap-4 mb-4">
+                <div><span class="legend-box" style="background: #e9ecef;"></span>Thường</div>
+                <div><span class="legend-box" style="background: #fff3cd;"></span>VIP</div>
+                <div><span class="legend-box" style="background: #f8d7da;"></span>Bảo trì</div>
+            </div>
+
+            <div class="screen-container">
+                <div class="screen"></div>
+            </div>
+
+            <div class="seat-map">
+                <div th:each="seat : ${seats}"
+                     th:id="'seat-' + ${seat.natSeatId}"
+                     th:class="'seat ' +
+               (${seat.natSeatType != null && seat.natSeatType.name() == 'VIP'} ? 'seat-vip' : '') + ' ' +
+               (${seat.natStatus != null && seat.natStatus.name() == 'MAINTENANCE'} ? 'seat-maintenance' : '')"
+                     th:onclick="'toggleSeatStatus(' + ${seat.natSeatId} + ')'"
+                     th:title="${seat.natSeatType}">
+
+                    <span th:text="${seat.natSeatCode}">A1</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleSeatStatus(seatId) {
+            if (!confirm('Đổi trạng thái bảo trì ghế này?')) return;
+
+            fetch('/admin/seats/toggle-maintenance/' + seatId, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    let seatElement = document.getElementById('seat-' + seatId);
+                    seatElement.classList.toggle('seat-maintenance');
+                } else {
+                    alert("Lỗi server.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</section>
+</body>
+</html>

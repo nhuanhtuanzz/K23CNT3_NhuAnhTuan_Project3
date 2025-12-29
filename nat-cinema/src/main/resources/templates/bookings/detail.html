@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/client-layout :: layout(~{::section})}">
+<head>
+    <title>Vé của tôi</title>
+</head>
+<body>
+
+<section class="py-5 d-flex align-items-center justify-content-center"
+         style="min-height: 85vh; background: #1a1a2e;">
+
+    <style>
+        .ticket-wrapper {
+            background: #fff; /* Vé nền trắng cho dễ đọc mã */
+            color: #333;
+            max-width: 450px;
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        /* Phần đầu vé (Màu tím thương hiệu) */
+        .ticket-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            position: relative;
+            text-align: center;
+        }
+        .ticket-header h4 { font-weight: 800; letter-spacing: 1px; margin: 0; }
+
+        /* Đường cắt vé */
+        .cut-line {
+            height: 20px;
+            background: #fff;
+            position: relative;
+            margin: 0 20px;
+            border-bottom: 2px dashed #ccc;
+        }
+        .cut-line::before, .cut-line::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            width: 20px; height: 20px;
+            background: #1a1a2e; /* Trùng màu nền body */
+            border-radius: 50%;
+        }
+        .cut-line::before { left: -30px; }
+        .cut-line::after { right: -30px; }
+
+        .ticket-body { padding: 30px; }
+
+        /* Mã vé to */
+        .big-code {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #764ba2;
+            letter-spacing: 4px;
+            text-align: center;
+            margin: 10px 0;
+            border: 3px solid #764ba2;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .qr-placeholder {
+            width: 120px; height: 120px;
+            background: #f8f9fa;
+            margin: 0 auto;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #ddd;
+        }
+
+        .ticket-item {
+            margin-bottom: 15px;
+        }
+        .ticket-label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .ticket-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #000;
+        }
+    </style>
+
+    <div class="ticket-wrapper">
+        <div class="ticket-header">
+            <h4>NAT CINEMA</h4>
+            <div class="small opacity-75">VÉ XEM PHIM ĐIỆN TỬ</div>
+        </div>
+
+        <div class="ticket-body pb-0">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold mb-1 text-uppercase" th:text="${booking.natShowtime.natMovie.natTitle}">TEN PHIM</h3>
+                <span class="badge bg-dark">2D / Phụ đề</span>
+            </div>
+
+            <div class="row">
+                <div class="col-6 ticket-item">
+                    <div class="ticket-label">Ngày chiếu</div>
+                    <div class="ticket-value text-primary"
+                         th:text="${#temporals.format(booking.natShowtime.natStartTime, 'dd/MM/yyyy')}"></div>
+                </div>
+                <div class="col-6 ticket-item text-end">
+                    <div class="ticket-label">Giờ chiếu</div>
+                    <div class="ticket-value text-primary"
+                         th:text="${#temporals.format(booking.natShowtime.natStartTime, 'HH:mm')}"></div>
+                </div>
+
+                <div class="col-6 ticket-item">
+                    <div class="ticket-label">Rạp</div>
+                    <div class="ticket-value" th:text="${booking.natShowtime.natCinemaRoom.natRoomName}"></div>
+                </div>
+                <div class="col-6 ticket-item text-end">
+                    <div class="ticket-label">Ghế</div>
+                    <div class="ticket-value text-danger">
+                        <span th:each="bs, iterStat : ${booking.bookingSeats}"
+                              th:text="${bs.natSeat.natSeatCode} + (${!iterStat.last} ? ', ' : '')"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cut-line"></div>
+
+        <div class="ticket-body pt-2 text-center">
+            <div class="ticket-label mb-2">Mã vé (Đưa cho nhân viên)</div>
+            <div class="big-code" th:text="${booking.natBookingCode}">NAT-XYZ</div>
+
+            <div class="mt-4">
+                <i class="bi bi-qr-code-scan" style="font-size: 4rem; color: #333;"></i>
+                <p class="small text-muted mt-2">Quét mã để vào cổng</p>
+            </div>
+
+            <div class="mt-4 border-top pt-3">
+                <a href="/bookings/my-bookings" class="btn btn-dark btn-sm rounded-pill w-100">
+                    <i class="bi bi-clock-history me-1"></i> Lịch sử đặt vé
+                </a>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

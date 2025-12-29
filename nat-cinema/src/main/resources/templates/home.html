@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/client-layout :: layout(~{::section})}">
+<head>
+    <title>Trang chủ</title>
+</head>
+<body>
+
+<section>
+
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active" style="height: 500px;">
+                <img src="https://wallpapers.com/images/hd/avengers-endgame-characters-1920-x-1080-wallpaper-f236081577-7u774.jpg"
+                     class="d-block w-100 h-100 object-fit-cover" alt="Banner 1" style="filter: brightness(0.6);">
+                <div class="carousel-caption d-none d-md-block text-start">
+                    <h1 class="display-4 fw-bold text-uppercase" style="text-shadow: 2px 2px 4px #000;">Bom tấn tháng này</h1>
+                    <p class="lead">Trải nghiệm điện ảnh sống động chưa từng có tại Nat Cinema.</p>
+                    <a href="#movie-section" class="btn btn-primary btn-lg rounded-pill px-4 shadow">Đặt vé ngay</a>
+                </div>
+            </div>
+            <div class="carousel-item" style="height: 500px;">
+                <img src="https://images4.alphacoders.com/132/1328008.jpeg"
+                     class="d-block w-100 h-100 object-fit-cover" alt="Banner 2" style="filter: brightness(0.6);">
+                <div class="carousel-caption d-none d-md-block text-start">
+                    <h1 class="display-4 fw-bold text-uppercase">Phim mới ra mắt</h1>
+                    <p class="lead">Cập nhật liên tục các suất chiếu sớm nhất.</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+
+    <div class="container py-5" id="movie-section">
+        <div class="d-flex justify-content-between align-items-end mb-4 border-bottom border-secondary pb-2">
+            <h2 class="text-uppercase fw-bold mb-0">
+                <span style="border-bottom: 3px solid var(--nat-accent);">Phim Đang Chiếu</span>
+            </h2>
+            <a href="/showtimes" class="text-decoration-none text-info small">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+
+            <div class="col" th:each="movie : ${movies}">
+                <div class="card h-100 border-0 rounded-3 overflow-hidden movie-card" style="background-color: #16213e;">
+
+                    <div class="position-relative" style="height: 350px;">
+                        <img th:src="${movie.natImage != null ? movie.natImage : 'https://placehold.co/300x450/222/fff?text=No+Poster'}"
+                             class="card-img-top h-100 w-100 object-fit-cover"
+                             th:alt="${movie.natTitle}">
+
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-white text-truncate fw-bold" th:text="${movie.natTitle}">Tên Phim</h5>
+
+                        <div class="small text-secondary mb-3 d-flex justify-content-between">
+                            <span><i class="bi bi-clock me-1"></i><span th:text="${movie.natDuration + ' phút'}">120p</span></span>
+                            <span><i class="bi bi-tags me-1"></i>Hành động</span>
+                        </div>
+
+                        <div class="mt-auto d-grid gap-2">
+                            <a th:href="@{/showtimes(movieId=${movie.natMovieId})}"
+                               class="btn btn-outline-primary btn-sm rounded-pill fw-bold">
+                                <i class="bi bi-ticket-fill me-1"></i> Mua vé
+                            </a>
+                            <a href="@{/movies/detail/{id}(id=${movie.natMovieId})}" class="btn btn-sm btn-link text-white-50 text-decoration-none">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${movies.isEmpty()}" class="text-center py-5 text-muted">
+            <h3>Hiện chưa có phim nào đang chiếu</h3>
+            <p>Vui lòng quay lại sau.</p>
+        </div>
+
+    </div>
+
+    <div class="container-fluid py-5 bg-dark">
+        <div class="container text-center">
+            <h3 class="mb-4 text-white">Thành viên Nat Cinema</h3>
+            <p class="text-white-50 mb-4">Đăng ký ngay để tích điểm và nhận bắp nước miễn phí!</p>
+            <div th:if="${session.loggedInUser == null}">
+                <a href="/auth/register" class="btn btn-light px-5 rounded-pill fw-bold text-primary">Đăng ký ngay</a>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+</body>
+</html>

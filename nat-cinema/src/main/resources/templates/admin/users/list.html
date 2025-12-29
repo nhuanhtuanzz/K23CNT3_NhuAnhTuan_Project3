@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin-layout :: layout(~{::section})}">
+<head>
+    <title>Quản lý Người dùng</title>
+</head>
+<body>
+<section>
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .user-avatar {
+            width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+            border: 2px solid #e0e0e0;
+        }
+        .role-select {
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        /* Màu riêng cho select box khi chọn Admin/User */
+        .role-admin { border-color: #764ba2; color: #764ba2; background-color: #f3e5f5; }
+        .role-user { border-color: #6c757d; color: #6c757d; background-color: #f8f9fa; }
+    </style>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary" style="color: #764ba2 !important;">
+            <i class="bi bi-people-fill"></i> Quản lý Người dùng
+        </h2>
+        <span class="badge bg-light text-dark border p-2">
+            Tổng: <span th:text="${users.size()}">0</span> users
+        </span>
+    </div>
+
+    <div class="card shadow-sm border-0 overflow-hidden">
+        <div class="card-header bg-gradient-primary text-white py-3">
+            <h5 class="m-0 fs-6 text-uppercase fw-bold">Danh sách tài khoản</h5>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th class="text-center ps-4">ID</th>
+                    <th>Thông tin cá nhân</th>
+                    <th>Email / Liên hệ</th>
+                    <th>Quyền hạn (Role)</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}">
+                    <td class="text-center text-muted fw-bold ps-4" th:text="'#' + ${user.natUserId}"></td>
+
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.natFullname} + '&background=random'}"
+                                 class="user-avatar me-3 shadow-sm" alt="Avatar">
+                            <div>
+                                <div class="fw-bold text-dark" th:text="${user.natFullname}">Tên User</div>
+                                <small class="text-muted" th:text="${#strings.toLowerCase(user.natRole)}">role</small>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="d-flex align-items-center text-secondary">
+                            <i class="bi bi-envelope me-2"></i>
+                            <span th:text="${user.natEmail}">email@example.com</span>
+                        </div>
+                        <div class="text-muted small mt-1" th:if="${user.natPhone}">
+                            <i class="bi bi-telephone me-2"></i> <span th:text="${user.natPhone}"></span>
+                        </div>
+                    </td>
+
+                    <td>
+                        <form th:action="@{/admin/users/update-role/{id}(id=${user.natUserId})}" method="post">
+                            <select name="role" onchange="this.form.submit()"
+                                    class="form-select form-select-sm role-select shadow-sm"
+                                    th:classappend="${user.natRole.name() == 'ADMIN'} ? 'role-admin' : 'role-user'"
+                                    style="width: 110px;">
+                                <option value="USER" th:selected="${user.natRole.name() == 'USER'}">USER</option>
+                                <option value="ADMIN" th:selected="${user.natRole.name() == 'ADMIN'}">ADMIN</option>
+                            </select>
+                        </form>
+                    </td>
+
+                    <td class="text-center">
+                        <form th:if="${currentUser != null and user.natUserId != currentUser.natUserId}"
+                              th:action="@{/admin/users/delete/{id}(id=${user.natUserId})}" method="post">
+                            <button type="submit" class="btn btn-danger btn-sm rounded-circle"
+                                    style="width: 35px; height: 35px;"
+                                    onclick="return confirm('CẢNH BÁO: Bạn có chắc muốn xóa người dùng này? Hành động này không thể hoàn tác!')"
+                                    title="Xóa người dùng">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+
+                        <span th:if="${currentUser != null and user.natUserId == currentUser.natUserId}"
+                              class="badge bg-success bg-opacity-10 text-success border border-success">
+                            Bạn
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</body>
+</html>

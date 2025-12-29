@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin-layout :: layout(~{::section})}">
+<head>
+    <title>Quản lý Đặt Vé</title>
+</head>
+<body>
+
+<section>
+
+    <style>
+        .seat-badge { font-size: 0.75rem; min-width: 30px; font-weight: 600; }
+        .status-badge { min-width: 130px; }
+        .table-card { border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .avatar-circle { width: 35px; height: 35px; background-color: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4a5568; font-weight: bold; font-size: 0.8rem;}
+    </style>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h4 class="mb-1 fw-bold text-dark" style="color: #4a5568;">Danh sách Đặt Vé</h4>
+            <p class="text-muted mb-0 small">Quản lý các giao dịch đặt vé hiện tại.</p>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body py-2 px-3">
+                <form action="/admin/bookings/list" method="get" class="d-flex align-items-center gap-2">
+                    <label class="fw-bold text-secondary mb-0 small"><i class="bi bi-funnel"></i> Lọc:</label>
+                    <select name="status" class="form-select form-select-sm border-secondary-subtle" style="width: 200px;" onchange="this.form.submit()">
+                        <option value="ALL" th:selected="${selectedStatus == 'ALL'}">-- Tất cả --</option>
+                        <option th:each="st : ${statuses}"
+                                th:value="${st}"
+                                th:text="${st}"
+                                th:selected="${selectedStatus == st.name()}">
+                        </option>
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="card table-card overflow-hidden bg-white">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                    <tr>
+                        <th class="ps-4 py-3">Mã Vé</th>
+                        <th>Khách hàng</th>
+                        <th>Phim & Suất chiếu</th>
+                        <th>Ghế</th>
+                        <th class="text-center">Ngày đặt</th>
+                        <th class="text-end">Thành tiền</th>
+                        <th class="text-center">Trạng thái</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="booking : ${bookings}" class="border-bottom">
+                        <td class="ps-4">
+                            <span class="fw-bold text-primary">#<span th:text="${booking.natBookingId}"></span></span>
+                        </td>
+
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-2">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.95rem;"
+                                         th:text="${booking.natUser != null ? booking.natUser.natFullname : 'Khách vãng lai'}">Name</div>
+                                    <div class="text-muted" style="font-size: 0.8rem;"
+                                         th:text="${booking.natUser != null ? booking.natUser.natEmail : ''}">mail</div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="fw-bold text-dark" th:text="${booking.natShowtime.natMovie.natTitle}">Title</div>
+                            <div class="small text-muted mt-1">
+                                <span class="badge bg-light text-dark border me-1">
+                                    <i class="bi bi-display"></i>
+                                    <span th:text="${booking.natShowtime.natCinemaRoom.natRoomName}">Room</span>
+                                </span>
+                                <span><i class="bi bi-clock"></i> <span th:text="${#temporals.format(booking.natShowtime.natStartTime, 'HH:mm dd/MM')}"></span></span>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="d-flex flex-wrap gap-1" style="max-width: 180px;">
+                                <span th:each="bs : ${booking.bookingSeats}"
+                                      class="badge bg-secondary-subtle text-dark seat-badge border">
+                                    <span th:text="${bs.natSeat.natSeatCode}">A1</span>
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <div class="small text-dark fw-bold" th:text="${#temporals.format(booking.natCreatedAt, 'dd/MM/yyyy')}"></div>
+                            <div class="small text-muted" th:text="${#temporals.format(booking.natCreatedAt, 'HH:mm')}"></div>
+                        </td>
+
+                        <td class="text-end">
+                            <span class="fw-bold text-danger"
+                                  th:text="${#numbers.formatDecimal(booking.natBookingSeats.size() * booking.natShowtime.natPrice, 0, 'COMMA', 0, 'POINT')}">
+                            </span> ₫
+                        </td>
+
+                        <td class="text-center">
+                            <span th:if="${booking.natStatus.name() == 'PENDING'}" class="badge bg-warning text-dark status-badge rounded-pill shadow-sm">
+                                <i class="bi bi-hourglass-split me-1"></i> Chờ TT
+                            </span>
+                            <span th:if="${booking.natStatus.name() == 'PAID'}" class="badge bg-success status-badge rounded-pill shadow-sm">
+                                <i class="bi bi-check-circle me-1"></i> Đã TT
+                            </span>
+                            <span th:if="${booking.natStatus.name() == 'CANCELLED'}" class="badge bg-danger status-badge rounded-pill shadow-sm">
+                                <i class="bi bi-x-circle me-1"></i> Đã hủy
+                            </span>
+                        </td>
+
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <form th:if="${booking.natStatus.name() == 'PENDING'}"
+                                      action="/admin/bookings/update-status" method="post">
+                                    <input type="hidden" name="bookingId" th:value="${booking.natBookingId}" />
+                                    <input type="hidden" name="newStatus" value="PAID" />
+                                    <button type="submit" class="btn btn-sm btn-success shadow-sm px-2"
+                                            title="Xác nhận thanh toán"
+                                            onclick="return confirm('Xác nhận khách đã thanh toán?')">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+
+                                <form th:if="${booking.natStatus.name() != 'CANCELLED'}"
+                                      action="/admin/bookings/update-status" method="post">
+                                    <input type="hidden" name="bookingId" th:value="${booking.natBookingId}" />
+                                    <input type="hidden" name="newStatus" value="CANCELLED" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm px-2"
+                                            title="Hủy vé"
+                                            onclick="return confirm('Hủy vé này? Ghế sẽ được nhả ra.')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+
+                                <form th:if="${booking.natStatus.name() == 'CANCELLED'}"
+                                      action="/admin/bookings/update-status" method="post">
+                                    <input type="hidden" name="bookingId" th:value="${booking.natBookingId}" />
+                                    <input type="hidden" name="newStatus" value="PENDING" />
+                                    <button type="submit" class="btn btn-sm btn-light text-secondary border shadow-sm px-2"
+                                            title="Khôi phục trạng thái chờ">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${bookings.isEmpty()}" class="text-center py-5">
+                <div class="mb-3 opacity-25">
+                    <i class="bi bi-ticket-detailed" style="font-size: 3rem;"></i>
+                </div>
+                <h6 class="text-secondary fw-bold">Không tìm thấy dữ liệu</h6>
+                <p class="text-muted small">Chưa có vé nào khớp với bộ lọc hiện tại.</p>
+                <a href="/admin/bookings/list" class="btn btn-sm btn-primary">Xem tất cả</a>
+            </div>
+        </div>
+
+        <div class="card-footer bg-light border-top text-end py-2">
+            <small class="text-muted">Tổng cộng: <strong th:text="${bookings.size()}"></strong> bản ghi</small>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

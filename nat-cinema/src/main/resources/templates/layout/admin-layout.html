@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản trị - Nat Cinema</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --nat-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --nat-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --nat-radius: 10px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        /* --- SIDEBAR STYLE --- */
+        .sidebar {
+            min-height: 100vh;
+            background: var(--nat-gradient);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            color: white;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            margin: 5px 15px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background-color: white;
+            color: #764ba2;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-wrapper {
+            padding: 30px;
+        }
+
+        /* Hiệu ứng Header */
+        .top-header {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-greeting {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.95rem;
+        }
+
+        .btn-logout-header {
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-logout-header:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <nav class="col-md-2 d-none d-md-block sidebar p-0 d-flex flex-column">
+            <div class="brand-logo">
+                🎬 Nat Cinema
+            </div>
+
+            <ul class="nav flex-column mb-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/dashboard"
+                       th:classappend="${currentUri == '/admin/dashboard' ? 'active' : ''}">
+                        <i class="bi bi-speedometer2"></i> Tổng quan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/movies/list"
+                       th:classappend="${currentUri != null && currentUri.contains('/movies') ? 'active' : ''}">
+                        <i class="bi bi-film"></i> Quản lý Phim
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/showtimes"
+                       th:classappend="${currentUri != null && currentUri.contains('/showtimes') ? 'active' : ''}">
+                        <i class="bi bi-calendar-check"></i> Lịch chiếu
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/bookings/list"
+                       th:classappend="${currentUri != null && currentUri.contains('/bookings') ? 'active' : ''}">
+                        <i class="bi bi-ticket-perforated"></i> Đơn đặt vé
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/users"
+                       th:classappend="${currentUri != null && currentUri.contains('/users') ? 'active' : ''}">
+                        <i class="bi bi-people"></i> Người dùng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/rooms"
+                       th:classappend="${currentUri != null && currentUri.contains('/rooms') ? 'active' : ''}">
+                        <i class="bi bi-grid"></i> Phòng & Ghế
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="col-md-10 ms-sm-auto p-0">
+
+            <div class="top-header">
+                <h5 class="m-0 text-secondary fw-bold">Hệ thống quản lý</h5>
+
+                <div class="user-greeting">
+                    <div class="d-flex align-items-center gap-2" th:if="${user != null}">
+                        <span class="text-secondary">Xin chào,</span>
+                        <span class="fw-bold text-dark" th:text="${user.natFullname}">Admin</span>
+
+                        <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.natFullname} + '&background=764ba2&color=fff'}"
+                             class="rounded-circle border" width="35" height="35" alt="Avatar">
+                    </div>
+
+                    <div class="vr mx-2"></div> <a href="/auth/logout" class="btn-logout-header"
+                                                   onclick="return confirm('Bạn có chắc muốn đăng xuất?');">
+                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                </a>
+                </div>
+            </div>
+
+            <div class="main-wrapper">
+                <div th:replace="${content}"></div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

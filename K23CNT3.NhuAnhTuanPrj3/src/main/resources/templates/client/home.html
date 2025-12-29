@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Nat Cinema</title>
+</head>
+<body>
+<h1>Welcome to Nat Cinema</h1>
+
+<div th:if="${user}">
+    <p>Hello, <span th:text="${user.natFullname}"></span>!</p>
+    <p>You are logged in as: <span th:text="${user.natRole}"></span></p>
+    <a href="/auth/logout">Logout</a>
+</div>
+
+<div th:unless="${user}">
+    <p>You are not logged in.</p>
+    <a href="/login">Login</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/client-layout :: layout(~{::section})}">
+<head>
+    <title>Đặt vé thành công</title>
+</head>
+<body>
+
+<section class="py-5 d-flex align-items-center justify-content-center"
+         style="min-height: 85vh; background: #1a1a2e;">
+
+    <style>
+        .success-card {
+            background: #16213e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            box-shadow: 0 0 40px rgba(118, 75, 162, 0.3); /* Glow tím */
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Hiệu ứng vòng tròn lan tỏa */
+        .icon-container {
+            width: 100px; height: 100px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        .icon-container::after {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 2px solid #22c55e;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .booking-code-box {
+            background: #0f172a;
+            border: 2px dashed #764ba2;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .info-row {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .info-row:last-child { border-bottom: none; }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+            color: white;
+        }
+    </style>
+
+    <div class="success-card text-center p-4 p-md-5 text-white">
+        <div class="icon-container">
+            <i class="bi bi-check-lg text-success" style="font-size: 3rem;"></i>
+        </div>
+
+        <h2 class="fw-bold mb-1">Thanh toán thành công!</h2>
+        <p class="text-white-50 small">Cảm ơn bạn đã lựa chọn NatCinema.</p>
+
+        <div class="booking-code-box">
+            <small class="text-white-50 text-uppercase" style="letter-spacing: 1px;">Mã đặt vé</small>
+            <div class="fs-2 fw-bold text-warning" style="letter-spacing: 3px;"
+                 th:text="${booking.natBookingCode}">NAT-CODE</div>
+        </div>
+
+        <div class="text-start bg-white bg-opacity-10 rounded-3 p-3 mb-4 small">
+            <div class="info-row">
+                <span class="text-white-50">Phim:</span>
+                <span class="fw-bold text-end" th:text="${booking.natShowtime.natMovie.natTitle}"></span>
+            </div>
+            <div class="info-row">
+                <span class="text-white-50">Thời gian:</span>
+                <span class="fw-bold text-end text-info"
+                      th:text="${#temporals.format(booking.natShowtime.natStartTime, 'HH:mm - dd/MM/yyyy')}"></span>
+            </div>
+            <div class="info-row">
+                <span class="text-white-50">Rạp/Ghế:</span>
+                <span class="fw-bold text-end">
+                    <span th:text="${booking.natShowtime.natCinemaRoom.natRoomName}"></span> -
+                    <span th:each="bs : ${booking.bookingSeats}"
+                          th:text="${bs.natSeat.natSeatCode}" class="text-warning ms-1"></span>
+                </span>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a th:href="@{/bookings/detail/{id}(id=${booking.natBookingId})}" class="btn btn-gradient btn-lg rounded-pill">
+                <i class="bi bi-ticket-perforated me-2"></i>Xem vé điện tử
+            </a>
+            <a href="/" class="btn btn-outline-light rounded-pill border-0 text-white-50">
+                <i class="bi bi-house me-1"></i>Về trang chủ
+            </a>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

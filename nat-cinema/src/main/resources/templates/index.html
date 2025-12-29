@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/client-layout :: layout(~{::section})}">
+<head>
+    <title>Trang chủ - Nat Cinema</title>
+</head>
+<body>
+
+<section>
+
+    <div class="container mt-4">
+
+        <div th:if="${slides != null && !slides.isEmpty()}" id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel" data-bs-interval="2000">
+
+            <div class="carousel-indicators">
+                <button th:each="slide, iterStat : ${slides}"
+                        type="button"
+                        data-bs-target="#heroCarousel"
+                        th:data-bs-slide-to="${iterStat.index}"
+                        th:classappend="${iterStat.index == 0} ? 'active' : ''"></button>
+            </div>
+
+            <div class="carousel-inner rounded-4 shadow overflow-hidden">
+
+                <div th:each="slide, iterStat : ${slides}"
+                     class="carousel-item"
+                     th:classappend="${iterStat.index == 0} ? 'active' : ''"
+                     style="height: 480px;"
+                     data-bs-interval="3000"> <img th:if="${slide.natImageUrl != null}"
+                                                   th:src="@{'/images/' + ${slide.natImageUrl}}"
+                                                   class="d-block w-100 h-100 object-fit-cover"
+                                                   th:alt="${slide.natTitle}"
+                                                   style="filter: brightness(0.6);">
+
+                    <div th:if="${slide.natImageUrl == null}"
+                         class="d-block w-100 h-100 bg-secondary d-flex align-items-center justify-content-center">
+                        <span class="text-white">No Banner</span>
+                    </div>
+
+                    <div class="carousel-caption d-none d-md-block text-start pb-5">
+                        <h2 class="display-4 fw-bold text-uppercase"
+                            style="text-shadow: 2px 2px 8px #000;"
+                            th:text="${slide.natTitle != null ? slide.natTitle : (slide.natMovie != null ? slide.natMovie.natTitle : '')}">
+                            TIÊU ĐỀ
+                        </h2>
+
+                        <p class="lead fs-5" th:text="${slide.natCaption}">Mô tả...</p> <a th:href="${slide.natButtonLink != null ? slide.natButtonLink : (slide.natMovie != null ? '/movies/' + slide.natMovie.natMovieId : '#')}"
+                                                                                           class="btn btn-primary btn-lg rounded-pill px-4 shadow mt-2">
+                        <span th:text="${slide.natButtonText != null ? slide.natButtonText : 'Xem chi tiết'}">Xem ngay</span>
+                    </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="container py-5" id="movie-section">
+
+        <div class="d-flex justify-content-between align-items-end mb-4 border-bottom border-secondary pb-2">
+            <h2 class="text-uppercase fw-bold mb-0 text-white">
+                <span style="border-bottom: 3px solid #764ba2;">Phim Đang Chiếu</span>
+            </h2>
+            <a href="/showtimes" class="text-decoration-none text-info small">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+
+            <div class="col" th:each="movie : ${movies}">
+                <div class="card h-100 border-0 rounded-3 overflow-hidden movie-card" style="background-color: #16213e;">
+
+                    <div class="position-relative" style="height: 350px;">
+
+                        <img th:if="${movie.natPosterUrl != null}"
+                             th:src="@{'/images/' + ${movie.natPosterUrl}}"
+                             class="card-img-top h-100 w-100 object-fit-cover"
+                             th:alt="${movie.natTitle}">
+
+                        <div th:if="${movie.natPosterUrl == null}"
+                             class="d-flex align-items-center justify-content-center bg-secondary text-white h-100 w-100">
+                            <div class="text-center">
+                                <i class="bi bi-image fs-1 mb-2"></i><br>
+                                <span class="small">No Image</span>
+                            </div>
+                        </div>
+
+                        <span class="position-absolute top-0 end-0 m-2 badge bg-danger rounded-1 shadow">18+</span>
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-white text-truncate fw-bold"
+                            th:title="${movie.natTitle}"
+                            th:text="${movie.natTitle}">Tên Phim</h5>
+
+                        <div class="small text-secondary mb-3 d-flex justify-content-between">
+                            <span><i class="bi bi-clock me-1"></i><span th:text="${movie.natDuration}"></span> phút</span>
+                            <span><i class="bi bi-tags me-1"></i>Phim rạp</span>
+                        </div>
+
+                        <div class="mt-auto d-grid gap-2">
+                            <a th:href="@{/showtimes(movieId=${movie.natMovieId})}"
+                               class="btn btn-outline-primary btn-sm rounded-pill fw-bold">
+                                <i class="bi bi-ticket-fill me-1"></i> Mua vé
+                            </a>
+                            <a th:href="@{/movies/detail/{id}(id=${movie.natMovieId})}"
+                               class="btn btn-sm btn-link text-white-50 text-decoration-none">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${movies == null || movies.isEmpty()}" class="text-center py-5 text-muted">
+            <h3>Hiện chưa có phim nào đang chiếu</h3>
+            <p>Vui lòng quay lại sau.</p>
+        </div>
+
+    </div>
+
+    <div class="container-fluid py-5 bg-dark">
+        <div class="container text-center">
+            <h3 class="mb-4 text-white">Thành viên Nat Cinema</h3>
+            <p class="text-white-50 mb-4">Đăng ký ngay để tích điểm và nhận bắp nước miễn phí!</p>
+            <div th:if="${session.loggedInUser == null}">
+                <a href="/auth/register" class="btn btn-light px-5 rounded-pill fw-bold text-primary">Đăng ký ngay</a>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<section th:replace="~{layout/admin-layout :: layout(~{::content})}" xmlns:th="">
+    <div th:fragment="content">
+        <h2 class="mb-4"><i class="bi bi-door-open"></i> Danh sách phòng chiếu</h2>
+
+        <div class="card shadow-sm">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Tên phòng</th>
+                    <th>Quy mô</th>
+                    <th class="text-center">Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="room : ${rooms}">
+                    <td th:text="${room.natRoomId}"></td>
+                    <td class="fw-bold" th:text="${room.natRoomName}"></td>
+                    <td th:text="${room.natTotalSeats + ' ghế'}"></td>
+                    <td class="text-center">
+                        <a th:href="@{/admin/rooms/detail/{id}(id=${room.natRoomId})}"
+                           class="btn btn-primary btn-sm">
+                            <i class="bi bi-grid-3x3-gap"></i> Xem sơ đồ ghế
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

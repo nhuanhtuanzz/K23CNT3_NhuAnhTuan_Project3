@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập - Nat Cinema</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        /* Theme chung - Giữ nguyên màu của bạn */
+        :root {
+            --nat-primary: #764ba2;
+            --nat-primary-glow: rgba(118, 75, 162, 0.5);
+            --nat-dark: #1a1a2e;
+            --nat-card-bg: #16213e;
+            --nat-text: #eaeaea;
+        }
+
+        body {
+            background-color: var(--nat-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(circle at top right, #2c2c54, var(--nat-dark)); /* Thêm gradient nhẹ cho nền */
+        }
+
+        .login-card {
+            background-color: var(--nat-card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Viền mờ */
+            border-radius: 20px; /* Bo góc tròn hơn */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px var(--nat-primary-glow); /* Đổ bóng + Phát sáng */
+            max-width: 500px; /* Tăng kích thước chiều ngang */
+            width: 100%;
+        }
+
+        /* Custom Input - To hơn, rõ hơn */
+        .form-control {
+            background-color: #0f172a;
+            border: 2px solid #334155; /* Viền dày hơn */
+            color: #fff;
+            height: 50px; /* Cao hơn */
+            font-size: 1.05rem;
+            padding-left: 15px;
+        }
+
+        .form-control:focus {
+            background-color: #0f172a;
+            color: #fff;
+            border-color: var(--nat-primary);
+            box-shadow: 0 0 15px var(--nat-primary-glow); /* Hiệu ứng focus phát sáng */
+        }
+
+        .input-group-text {
+            background-color: #2d3748; /* Icon nền sáng hơn chút */
+            border: 2px solid #334155;
+            border-right: none;
+            color: var(--nat-primary); /* Icon màu tím */
+            font-size: 1.2rem;
+            width: 50px;
+            justify-content: center;
+        }
+
+        /* Hiệu ứng Button - To và nảy */
+        .btn-lg-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradient cho nút */
+            border: none;
+            height: 55px;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hiệu ứng nảy */
+        }
+        .btn-lg-custom:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(118, 75, 162, 0.6);
+        }
+
+        .hover-link:hover { color: var(--nat-primary) !important; }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 d-flex justify-content-center">
+
+            <div class="card login-card text-white">
+                <div class="card-body p-5"> <div class="text-center mb-5">
+                    <h1 class="fw-bold mb-2 display-6"><i class="bi bi-film me-2 text-primary"></i>NAT CINEMA</h1>
+                    <p class="text-white-50 fs-5">Chào mừng trở lại!</p>
+                </div>
+
+                    <div th:if="${param.registerSuccess}" class="alert alert-success border-0 bg-success bg-opacity-25 text-white d-flex align-items-center mb-4 p-3 rounded-4" role="alert">
+                        <i class="bi bi-check-circle-fill me-3 fs-3 text-success"></i>
+                        <div><strong>Đăng ký thành công!</strong><br>Vui lòng đăng nhập.</div>
+                    </div>
+                    <div th:if="${error}" class="alert alert-danger border-0 bg-danger bg-opacity-25 text-white d-flex align-items-center mb-4 p-3 rounded-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-3 fs-3 text-danger"></i>
+                        <div th:text="${error}">Lỗi</div>
+                    </div>
+
+                    <form th:action="@{/auth/login}" method="post">
+                        <div class="mb-4">
+                            <label class="form-label text-white-50 fw-bold ms-2 mb-2 text-uppercase" style="letter-spacing: 1px;">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text rounded-start-pill"><i class="bi bi-envelope-fill"></i></span>
+                                <input type="email" name="email" class="form-control rounded-end-pill" placeholder="Nhập email của bạn..." required>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <div class="d-flex justify-content-between align-items-center ms-2 mb-2">
+                                <label class="form-label text-white-50 fw-bold text-uppercase m-0" style="letter-spacing: 1px;">Mật khẩu</label>
+                                <a href="#" class="text-decoration-none text-primary small hover-link">Quên mật khẩu?</a>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text rounded-start-pill"><i class="bi bi-lock-fill"></i></span>
+                                <input type="password" name="password" class="form-control rounded-end-pill" placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg-custom rounded-pill fw-bold shadow">
+                                ĐĂNG NHẬP
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center pt-3">
+                        <p class="text-white-50 mb-3 fs-6">Chưa có tài khoản Nat Cinema?</p>
+                        <a href="/auth/register" class="btn btn-outline-light rounded-pill px-5 py-2 fw-bold hover-link" style="border-width: 2px;">TẠO TÀI KHOẢN MỚI</a>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-black bg-opacity-25 border-top border-secondary p-3 rounded-bottom-4">
+                    <div class="accordion accordion-flush" id="testAccAccordion">
+                        <div class="accordion-item bg-transparent">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent text-white-50 shadow-none py-1 px-0 small" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne">
+                                    <i class="bi bi-info-circle me-2"></i> Xem tài khoản Test
+                                </button>
+                            </h2>
+                            <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#testAccAccordion">
+                                <div class="accordion-body text-white-50 small px-0 pt-2">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>👑 Admin:</span> <span class="font-monospace text-warning">admin@gmail.com / 123</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>👤 User:</span> <span class="font-monospace text-info">user@gmail.com / 123</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

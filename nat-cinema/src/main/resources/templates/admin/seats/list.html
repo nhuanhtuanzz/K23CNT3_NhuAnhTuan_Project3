@@ -1,0 +1,17 @@
+<section th:replace="~{layout/admin-layout :: layout(~{::content})}" xmlns:th="http://www.w3.org/1999/xhtml">
+    <div th:fragment="content">
+        <h3>Sơ đồ ghế phòng #<span th:text="${roomId}"></span></h3>
+        <div class="mt-4 p-4 bg-light rounded border text-center">
+            <div class="mb-5 py-2 bg-secondary text-white w-50 mx-auto">MÀN HÌNH</div>
+
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <div th:each="seat : ${seats}"
+                     class="border p-2 rounded bg-white"
+                     style="width: 60px;">
+                    <small class="d-block text-muted" th:text="${seat.natSeatType}"></small>
+                    <strong th:text="${seat.natRow + seat.natNumber}"></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
